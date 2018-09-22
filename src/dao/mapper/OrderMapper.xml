@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.OrderDao">
+	<!--添加订单数据 -->
+	<insert id="addOrder" parameterType="bean.Order">
+		insert  into orders values (
+		 #{oid},
+  		 #{ordertime},
+   		 #{total},
+   		 #{state},
+   	     #{address},
+   		 #{name},
+  		 #{telephone},
+  		 #{uid}
+		)
+	</insert>
+
+	<!--添加订单项目数据-->
+	<insert id="addOrderItem" parameterType="bean.Orderitem">
+		insert  into  orderitem values (
+		 #{itemid},
+  		 #{counts},
+   		 #{subtotal},
+   		 #{pid},
+   		 #{oid}
+		)
+	</insert>
+
+	<select id="findOrderByMyUid" parameterType="String" resultMap="myCart">
+		SELECT
+	b.oid,
+	p.pname,
+	p.pimage,
+	p.shop_price,
+	b.count,
+	b.subtotal,
+	p.pid
+FROM
+	product p,
+	(
+	SELECT
+		a.oid,
+		o.pid,
+		o.subtotal,
+		o.count
+	FROM
+		( SELECT * FROM orders WHERE uid = #{0} LIMIT #{1},#{2} ) a
+		JOIN orderitem o ON a.oid = o.oid
+	) b
+WHERE
+	p.pid = b.pid
+	</select>
+	<resultMap id="myCart" type="bean.Order">
+		<id column="oid" property="oid"/>
+		<collection property="list" ofType="bean.Orderitem">
+			<result column="count" property="count"/>
+			<result column="subtotal" property="subtotal"/>
+			<association property="product" javaType="bean.Product">
+				<result column="pname" property="pname"/>
+				<result column="pimage" property="pimage"/>
+				<result column="pid" property="pid"/>
+				<result column="shop_price" property="shopPrice"/>
+			</association>
+		</collection>
+	</resultMap>
+	<!--获取某个用户已经下过的总订单数-->
+	<select id="getCouts" parameterType="String" resultType="int">
+		select Count(uid) from orders where uid=#{uid}
+	</select>
+
+	<update id="updateStateById" parameterType="Object">
+		update orders set state=#{1} where oid=#{0}
+	</update>
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.CategoryDao">
+	<sql id="allCols">
+		cid,
+		cname
+	</sql>
+	<!--查询所有的商品类别信息-->
+	<select id="findAll"  resultType="bean.Category">
+		select <include refid="allCols"/> from category
+	</select>
+
+
+</mapper>
